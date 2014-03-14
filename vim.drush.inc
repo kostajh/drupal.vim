@@ -102,8 +102,11 @@ function drush_vim_tag_gen($path = '.') {
   $options .= ' --exclude=' . implode(' --exclude=', $excludes);
 
   // Run ctags, generating $tag_file.
-  print dt('Some warning messages from ctags are normal.') . "\n\n";
-  exec("$ctags -f $tag_file $options $path");
+  drush_log(dt('Some warning messages from ctags are normal.'), 'ok');
+  $command = $ctags . ' -f ' . $tag_file . ' ' . $options . ' ' $path;
+  drush_log(dt('Running ctags: !command', array('!command' => $command)), 'ok');
+  drush_shell_exec($command);
+  drush_log(drush_shell_exec_output(), 'ok');
 
   // Skip lines matching these patterns.
   $patterns = array();

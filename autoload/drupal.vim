@@ -173,7 +173,7 @@ function! drupal#TagGen(type) " {{{
     return
   endif
   let options .= ' --tag-file=' . tagdir . '/tags'
-  execute 'Drush vimrc-tag-gen ' . options . ' ' . tagdir
+  execute 'Drush vim-tag-gen ' . options . ' ' . tagdir
 endfun
 " }}} }}}
 

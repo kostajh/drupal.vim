@@ -24,7 +24,7 @@ if strlen(b:Drupal_info.DRUPAL_ROOT)
 endif
 if strlen(b:Drupal_info.CORE)
   let tagfile = 'drupal' . b:Drupal_info.CORE . '.tags'
-  " <sfile>:p = .../vimrc/bundle/vim-plugin-for-drupal/ftplugin/drupal.vim
+  " <sfile>:p = .../ftplugin/drupal.vim
   let tags += [expand('<sfile>:p:h:h') . '/tagfiles/' . tagfile]
 endif
 for tagfile in tags
@@ -163,7 +163,7 @@ unlet s:options.shortcut
 if strlen(drupal#CtagsPath())
   call drupal#CreateMaps('n', '-Drupal.Tags Sep-', '', ':', s:options)
   call drupal#CreateMaps('n', 'tag-gen options', '',
-        \ ':Drush help vimrc-tag-gen<CR>', s:options)
+        \ ':Drush help vim-tag-gen<CR>', s:options)
   nmap <Plug>DrupalTagGenProject :call drupal#TagGen('project')<CR>
   call drupal#CreateMaps('n', 'tag-gen current project', '',
         \ '<Plug>DrupalTagGenProject', s:options)
