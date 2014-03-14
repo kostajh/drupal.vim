@@ -1,4 +1,10 @@
-Vim configuration files for Drupal developers
+Drupal Plugin for Vim
+=====================
+
+This is a fork of the [Vimrc project](http://drupal.org/project/vimrc) from
+Drupal.org.
+
+### Vim configuration files for Drupal developers
 
 The files in this directory are designed to make it easier for Drupal developers
 to edit files using vim.
