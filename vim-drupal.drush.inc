@@ -8,10 +8,10 @@
 /**
  * Implements hook_drush_command().
  */
-function vimrc_drush_command() {
+function vim_drush_command() {
   $items = array();
 
-  $items['vimrc-install'] = array(
+  $items['vim-install'] = array(
     'description' => 'Install the vim plugin for Drupal (vimrc project).',
     'arguments' => array(
     ),
@@ -21,16 +21,16 @@ function vimrc_drush_command() {
       'vimrc' => 'Path to vimrc file (defaults to $HOME/.vimrc, or $HOME/_vimrc on Windows).',
     ),
     'examples' => array(
-      'drush vimrc-install --vim-command=/home/drupaluser/bin/vim'
+      'drush vim-install --vim-command=/home/drupaluser/bin/vim'
       => 'Install the plugin using the executable at /home/drupaluser/bin/vim.',
-      'sudo drush vimrc-install --vimfiles=/usr/share/vim/vimcurrent --vimrc=/usr/share/vim/vimrc'
+      'sudo drush vim-install --vimfiles=/usr/share/vim/vimcurrent --vimrc=/usr/share/vim/vimrc'
       => 'Install the plugin system-wide. The example paths are suitable for some Linux distributions.',
     ),
     'aliases' => array(),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
   );
 
-  $items['vimrc-tag-gen'] = array(
+  $items['vim-tag-gen'] = array(
     'description' => 'Generate a tags file for use by vim and other programs.',
     'arguments' => array(
       'path' => 'System path to a file or directory (e.g. your Drupal distribution or a module folder). Defaults to the current directory.',
@@ -43,7 +43,7 @@ function vimrc_drush_command() {
       'make-portable' => 'Replace path with \'$DRUPAL_ROOT\' (defaults to "no")',
     ),
     'examples' => array(
-      'drush vimrc-tag-gen $HOME/Sites/drupal-7 --tag-file=drupal7.tags'
+      'drush vim-tag-gen $HOME/Sites/drupal-7 --tag-file=drupal7.tags'
       => 'Generate a tags file for your distribution of Drupal 7 and save it as drupal7.tags in the current directory.',
       'drush tags sites/all/modules/ctools --ctags=/usr/local/bin/ctags'
       => 'Generate a tags file for the ctools module using a specific ctags executable and save it as tags in the current directory.',
@@ -58,7 +58,7 @@ function vimrc_drush_command() {
 /**
  * Implements drush_hook_COMMAND_validate().
  */
-function drush_vimrc_install_validate() {
+function drush_vim_install_validate() {
   // Bail out if vim is not executable or is not the right version.
   $vim = drush_get_option('vim-command', 'vim');
   $vim = escapeshellcmd($vim);
@@ -91,7 +91,7 @@ function drush_vimrc_install_validate() {
 
   // Check that we can write to the vimrc file. If pathogen is not installed,
   // also check the vimfiles directory.
-  $vimrc = drush_get_option('vimrc', _vimrc_vimrc_default());
+  $vimrc = drush_get_option('vimrc', _vim_vimrc_default());
   // @todo Maybe this can be done with file_prepare_directory.
   if (!is_file($vimrc) && !touch($vimrc)) {
     $error = dt('Cannot create the vimrc file %vimrc. Specify another file with --vimrc.',
@@ -101,9 +101,9 @@ function drush_vimrc_install_validate() {
     $error = dt('Installation requires write access to the vimrc file %vimrc. Specify another file with --vimrc.',
       array('%vimrc' => $vimrc));
   }
-  elseif (!_vimrc_check_pathogen($vim)) {
+  elseif (!_vim_check_pathogen($vim)) {
     // Need to install pathogen.
-    $vimfiles = drush_get_option('vimfiles', _vimrc_vimfiles_default());
+    $vimfiles = drush_get_option('vimfiles', _vim_vimfiles_default());
     if (!is_dir($vimfiles) && !mkdir($vimfiles, 0777, TRUE)) {
       $error = dt('Cannot create the vimfiles directory %vimfiles. Specify another directory with --vimfiles.',
 	array('%vimfiles' => $vimfiles));
@@ -121,22 +121,22 @@ function drush_vimrc_install_validate() {
 /**
  * Return the default vimfiles directory, depending on the OS.
  */
-function _vimrc_vimfiles_default() {
+function _vim_vimfiles_default() {
     return drush_server_home() . (drush_is_windows() ?  '/vimfiles' : '/.vim');
 }
 
 /**
  * Return the default vimrc file, depending on the OS.
  */
-function _vimrc_vimrc_default() {
+function _vim_vimrc_default() {
     return drush_server_home() . (drush_is_windows() ?  '/_vimrc' : '/.vimrc');
 }
 
 /**
  * Check whether the pathogen plugin is installed.
  */
-function _vimrc_check_pathogen($vim) {
-  $lines = vimrc_vim_command($vim, '2verbose runtime autoload/pathogen.vim');
+function _vim_check_pathogen($vim) {
+  $lines = vim_vim_command($vim, '2verbose runtime autoload/pathogen.vim');
   if ($lines === FALSE) {
     return drush_set_error('DRUSH_APPLICATION_ERROR',
       dt('Error when calling vim to check for pathogen.'));
@@ -150,7 +150,7 @@ function _vimrc_check_pathogen($vim) {
  *
  * The calling function is reponsible for validating that $vim is executable.
  *
- * Example: $versionstring = vimrc_vim_command('/usr/local/bin/vim', 'version')
+ * Example: $versionstring = vim_vim_command('/usr/local/bin/vim', 'version')
  *
  * @param String $vim
  *   The name of the vim executable.
@@ -163,7 +163,7 @@ function _vimrc_check_pathogen($vim) {
  * @return Array
  *   The output of $command as an array of strings or FALSE on error.
  */
-function vimrc_vim_command($vim, $command, $implode = FALSE) {
+function vim_vim_command($vim, $command, $implode = FALSE) {
   $infile = drush_save_data_to_temp_file("$command\nqa!\n");
   $vimlog = drush_tempnam('vimrc');
   exec("$vim -e -s -N -V0$vimlog -S $infile", $output, $retval);
@@ -190,20 +190,20 @@ function vimrc_vim_command($vim, $command, $implode = FALSE) {
  * @return Array
  *   The output of $command as an array of strings or FALSE on error.
  */
-function vimrc_vim_commands($vim, $commands, $implode = FALSE) {
+function vim_vim_commands($vim, $commands, $implode = FALSE) {
   $command = implode("\n", $commands);
-  return vimrc_vim_command($vim, $command, $implode);
+  return vim_vim_command($vim, $command, $implode);
 }
 
 /**
  * Implements drush_hook_COMMAND().
  */
-function drush_vimrc_install($path = '.') {
+function drush_vim_install($path = '.') {
   $vim = drush_get_option('vim-command', 'vim');
-  $vimrc = drush_get_option('vimrc', _vimrc_vimrc_default());
-  $vimfiles = drush_get_option('vimfiles', _vimrc_vimfiles_default());
+  $vimrc = drush_get_option('vimrc', _vim_vimrc_default());
+  $vimfiles = drush_get_option('vimfiles', _vim_vimfiles_default());
 
-  if (_vimrc_check_pathogen($vim)) {
+  if (_vim_check_pathogen($vim)) {
     drush_log(dt('Pathogen plugin already installed.'));
   }
   else {
@@ -236,17 +236,17 @@ function drush_vimrc_install($path = '.') {
   // Avoid E_STRICT and E_WARNING messages from date().
   date_default_timezone_set('UTC');
   $vimrclines = array(
-    '" Following lines added by drush vimrc-install on ' . date('r') . '.',
+    '" Following lines added by drush vim-install on ' . date('r') . '.',
     'set nocompatible',
     "call pathogen#infect('$vimrcbundle')",
     "call pathogen#infect('$bundle')",
-    '" End of vimrc-install additions.',
+    '" End of vim-install additions.',
     '',
   );
   $runcommands = file_get_contents($vimrc);
   if (strpos($runcommands, "call pathogen#infect('$vimrcbundle')") === FALSE) {
     if (empty($runcommands)) {
-      $runcommands = file_get_contents("$DIR/examples/vimrc_standard.vim");
+      $runcommands = file_get_contents("$DIR/examples/vim_standard.vim");
     }
     drush_log(dt('Rewriting vimrc file %vimrc.', array('%vimrc' => $vimrc)));
     drush_op('file_put_contents', $vimrc, implode("\n", $vimrclines) . $runcommands);
@@ -266,13 +266,13 @@ function drush_vimrc_install($path = '.') {
     drush_op('mkdir', $bundle);
   }
   if (file_exists($bundle) && is_writable($bundle)) {
-    vimrc_download_plugins($vim, $vimrc, $bundle);
+    vim_download_plugins($vim, $vimrc, $bundle);
   }
 
   // Update the help tags, using the pathogen variant of :helptags.
   drush_log(dt('Updating help tags.', array()));
   $vimrclines[] =  'call pathogen#helptags()';
-  drush_op('vimrc_vim_commands', $vim, $vimrclines);
+  drush_op('vim_vim_commands', $vim, $vimrclines);
 
   return;
 }
@@ -281,7 +281,7 @@ function drush_vimrc_install($path = '.') {
  * Download vim plugins.
  *
  * Once Pathogen is installed, other plugins can be saved in the bundle
- * directory. The Pathogen plugin is installed by `drush vimrc-install` and
+ * directory. The Pathogen plugin is installed by `drush vim-install` and
  * cannot be handled by thihs function.
  *
  * @todo For now, the function ignores the 'description' and 'git uri' keys.
@@ -315,7 +315,7 @@ function drush_vimrc_install($path = '.') {
  *   An array of paths to the installed plugins, using the same keys as
  *   $plugins. If there is a problem with a plugin, then the value will be ''.
  */
-function vimrc_download_plugins($vim, $vimrc, $bundle, $update = FALSE, $plugins = array()) {
+function vim_download_plugins($vim, $vimrc, $bundle, $update = FALSE, $plugins = array()) {
   if (empty($plugins)) {
     // The install script calls this function with $plugins empty. Install the
     // following plugins. See http://drupal.org/node/1389472.
@@ -367,7 +367,7 @@ function vimrc_download_plugins($vim, $vimrc, $bundle, $update = FALSE, $plugins
     'runtime! plugin/**/*.vim',
     'scriptnames',
   );
-  $message = vimrc_vim_commands($vim, $lines, TRUE);
+  $message = vim_vim_commands($vim, $lines, TRUE);
 
   // For each plugin, check whether it is installed. If not, then download the
   // tarball and extract it to $bundle.
@@ -391,7 +391,7 @@ function vimrc_download_plugins($vim, $vimrc, $bundle, $update = FALSE, $plugins
     }
     $tempdir = drush_tempdir();
     // See http://drupal.org/node/1642444#comment-6742834.
-    if (!$path = _vimrc_download_file($info['tarball'], "$tempdir/$tarball")) {
+    if (!$path = _vim_download_file($info['tarball'], "$tempdir/$tarball")) {
       drush_log(dt('Failed to download %plugin from @uri.', array(
         '%plugin' => $info['name'],
         '@uri' => $info['tarball'],
@@ -422,7 +422,7 @@ function vimrc_download_plugins($vim, $vimrc, $bundle, $update = FALSE, $plugins
  * Poor substitute for _drush_download_file(), add --no-check-certificate.
  * See http://drupal.org/node/1642444#comment-6742834
  */
-function _vimrc_download_file($url, $destination, $overwrite = TRUE) {
+function _vim_download_file($url, $destination, $overwrite = TRUE) {
   static $use_wget;
   if ($use_wget === NULL) {
     $use_wget = drush_shell_exec('which wget');
@@ -450,7 +450,7 @@ function _vimrc_download_file($url, $destination, $overwrite = TRUE) {
 /**
  * Implements drush_hook_COMMAND_validate().
  */
-function drush_vimrc_tag_gen_validate() {
+function drush_vim_tag_gen_validate() {
   // Bail out if ctags is not executable or is not the right version.
   $ctags = drush_get_option('ctags', 'ctags');
   $ctags = escapeshellcmd($ctags);
@@ -481,7 +481,7 @@ function drush_vimrc_tag_gen_validate() {
 /**
  * Implements drush_hook_COMMAND().
  */
-function drush_vimrc_tag_gen($path = '.') {
+function drush_vim_tag_gen($path = '.') {
   // Get the option values.  The validate function sets some of them.
   $ctags = drush_get_option('ctags', 'ctags');
   $tag_file = drush_get_option('tag-file', 'tags');
