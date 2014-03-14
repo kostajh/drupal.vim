@@ -103,7 +103,7 @@ function drush_vim_tag_gen($path = '.') {
 
   // Run ctags, generating $tag_file.
   drush_log(dt('Some warning messages from ctags are normal.'), 'ok');
-  $command = $ctags . ' -f ' . $tag_file . ' ' . $options . ' ' $path;
+  $command = $ctags . ' -f ' . $tag_file . ' ' . $options . ' ' . $path;
   drush_log(dt('Running ctags: !command', array('!command' => $command)), 'ok');
   drush_shell_exec($command);
   drush_log(drush_shell_exec_output(), 'ok');
