@@ -82,7 +82,6 @@ function drush_vim_tag_gen($path = '.') {
     $path = realpath($path);
     // Replace the path (but not any trailing '/') with '$DRUPAL_ROOT'.
     $shortpath = rtrim($path, '/');
-    $length = strlen($shortpath);
   }
 
   // Figure out which ctags options to use.
