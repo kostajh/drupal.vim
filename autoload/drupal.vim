@@ -201,11 +201,13 @@ function! drupal#DrupalInfo() " {{{
   let info.CORE = drupaldetect#CoreVersion(info.INFO_FILE)
   " If we found only one of CORE and DRUPAL_ROOT, use it to get the other.
   if info.CORE == '' && info.DRUPAL_ROOT != ''
+    " Drupal 6/7
     let INFO_FILE = info.DRUPAL_ROOT . '/modules/system/system.info'
     if filereadable(INFO_FILE)
       let info.CORE = drupaldetect#CoreVersion(INFO_FILE)
     else
-      let INFO_FILE = info.DRUPAL_ROOT . '/core/modules/system/system.info'
+      " Drupal 8
+      let INFO_FILE = info.DRUPAL_ROOT . '/core/modules/system/system.info.yml'
       if filereadable(INFO_FILE)
 	let info.CORE = drupaldetect#CoreVersion(INFO_FILE)
       endif
